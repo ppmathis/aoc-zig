@@ -31,6 +31,21 @@ pub fn build(b: *std.Build) !void {
     const prepare_step = b.step("prepare", "Prepare the AoC puzzle");
     prepare_step.makeFn = prepareStep;
 
+    // Helpers Module
+    const helpers_mod = b.createModule(.{
+        .root_source_file = b.path("src/helpers.zig"),
+        .target = target,
+        .optimize = optimize,
+    });
+
+    // Problem Module
+    const problem_mod = b.createModule(.{
+        .root_source_file = problem_path,
+        .target = target,
+        .optimize = optimize,
+    });
+    problem_mod.addImport("helpers", helpers_mod);
+
     // Executable
     const exe_name = try std.fmt.allocPrint(b.allocator, "aoc{d}-day{d}", .{ opt_aoc_year, opt_aoc_day });
     defer b.allocator.free(exe_name);
@@ -42,7 +57,8 @@ pub fn build(b: *std.Build) !void {
         .optimize = optimize,
     });
 
-    exe.root_module.addAnonymousImport("problem", .{ .root_source_file = problem_path });
+    exe.root_module.addImport("helpers", helpers_mod);
+    exe.root_module.addImport("problem", problem_mod);
     exe.root_module.addAnonymousImport("input", .{ .root_source_file = input_path });
     exe.step.dependOn(prepare_step);
 
@@ -65,6 +81,8 @@ pub fn build(b: *std.Build) !void {
         .target = target,
         .optimize = optimize,
     });
+    exe_unit_tests.root_module.addImport("helpers", helpers_mod);
+
     const run_exe_unit_tests = b.addRunArtifact(exe_unit_tests);
     run_exe_unit_tests.step.dependOn(prepare_step);
 
@@ -73,6 +91,8 @@ pub fn build(b: *std.Build) !void {
         .target = target,
         .optimize = optimize,
     });
+    problem_unit_tests.root_module.addImport("helpers", helpers_mod);
+
     const run_problem_unit_tests = b.addRunArtifact(problem_unit_tests);
     run_problem_unit_tests.step.dependOn(prepare_step);
 
