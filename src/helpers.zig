@@ -31,6 +31,10 @@ pub fn Set(comptime T: type) type {
             return self.data.count();
         }
 
+        pub fn clear(self: *Self) void {
+            self.data.clearAndFree();
+        }
+
         pub fn deinit(self: *Self) void {
             self.data.deinit();
         }
