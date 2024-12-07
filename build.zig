@@ -82,9 +82,7 @@ pub fn build(b: *std.Build) !void {
         .optimize = optimize,
     });
     exe_unit_tests.root_module.addImport("helpers", helpers_mod);
-
-    const run_exe_unit_tests = b.addRunArtifact(exe_unit_tests);
-    run_exe_unit_tests.step.dependOn(prepare_step);
+    exe_unit_tests.step.dependOn(prepare_step);
 
     const problem_unit_tests = b.addTest(.{
         .root_source_file = problem_path,
@@ -92,9 +90,10 @@ pub fn build(b: *std.Build) !void {
         .optimize = optimize,
     });
     problem_unit_tests.root_module.addImport("helpers", helpers_mod);
+    problem_unit_tests.step.dependOn(prepare_step);
 
+    const run_exe_unit_tests = b.addRunArtifact(exe_unit_tests);
     const run_problem_unit_tests = b.addRunArtifact(problem_unit_tests);
-    run_problem_unit_tests.step.dependOn(prepare_step);
 
     const test_step = b.step("test", "Test the AoC puzzle");
     test_step.dependOn(&run_exe_unit_tests.step);
