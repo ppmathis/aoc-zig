@@ -164,23 +164,24 @@ const Grid = struct {
     }
 };
 
+const example_input =
+    \\MMMSXXMASM
+    \\MSAMXMSMSA
+    \\AMXSXMAAMM
+    \\MSAMASMSMX
+    \\XMASAMXAMM
+    \\XXAMMXXAMA
+    \\SMSMSASXSS
+    \\SAXAMASAAA
+    \\MAMMMXMMMM
+    \\MXMXAXMASX
+;
+
 test "part 1: example" {
     const allocator = std.testing.allocator;
-    const input =
-        \\MMMSXXMASM
-        \\MSAMXMSMSA
-        \\AMXSXMAAMM
-        \\MSAMASMSMX
-        \\XMASAMXAMM
-        \\XXAMMXXAMA
-        \\SMSMSASXSS
-        \\SAXAMASAAA
-        \\MAMMMXMMMM
-        \\MXMXAXMASX
-    ;
 
     const problem = Problem{
-        .input = input,
+        .input = example_input,
         .allocator = allocator,
     };
 
@@ -189,21 +190,9 @@ test "part 1: example" {
 
 test "part 2: example" {
     const allocator = std.testing.allocator;
-    const input =
-        \\MMMSXXMASM
-        \\MSAMXMSMSA
-        \\AMXSXMAAMM
-        \\MSAMASMSMX
-        \\XMASAMXAMM
-        \\XXAMMXXAMA
-        \\SMSMSASXSS
-        \\SAXAMASAAA
-        \\MAMMMXMMMM
-        \\MXMXAXMASX
-    ;
 
     const problem = Problem{
-        .input = input,
+        .input = example_input,
         .allocator = allocator,
     };
 

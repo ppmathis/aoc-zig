@@ -119,19 +119,20 @@ fn validateReportLevels(levels: []const i64, skip_index: ?usize) struct { safe: 
     return .{ .safe = true, .violator = null };
 }
 
+const example_input =
+    \\7 6 4 2 1
+    \\1 2 7 8 9
+    \\9 7 6 2 1
+    \\1 3 2 4 5
+    \\8 6 4 4 1
+    \\1 3 6 7 9
+;
+
 test "part 1: example" {
     const allocator = std.testing.allocator;
-    const input =
-        \\7 6 4 2 1
-        \\1 2 7 8 9
-        \\9 7 6 2 1
-        \\1 3 2 4 5
-        \\8 6 4 4 1
-        \\1 3 6 7 9
-    ;
 
     const problem = Problem{
-        .input = input,
+        .input = example_input,
         .allocator = allocator,
     };
 
@@ -140,17 +141,9 @@ test "part 1: example" {
 
 test "part 2: example" {
     const allocator = std.testing.allocator;
-    const input =
-        \\7 6 4 2 1
-        \\1 2 7 8 9
-        \\9 7 6 2 1
-        \\1 3 2 4 5
-        \\8 6 4 4 1
-        \\1 3 6 7 9
-    ;
 
     const problem = Problem{
-        .input = input,
+        .input = example_input,
         .allocator = allocator,
     };
 

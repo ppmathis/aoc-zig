@@ -80,19 +80,20 @@ const Data = struct {
     }
 };
 
+const example_input =
+    \\3   4
+    \\4   3
+    \\2   5
+    \\1   3
+    \\3   9
+    \\3   3
+;
+
 test "part 1: example" {
     const allocator = std.testing.allocator;
-    const input =
-        \\3   4
-        \\4   3
-        \\2   5
-        \\1   3
-        \\3   9
-        \\3   3
-    ;
 
     const problem = Problem{
-        .input = input,
+        .input = example_input,
         .allocator = allocator,
     };
 
@@ -101,17 +102,9 @@ test "part 1: example" {
 
 test "part 2: example" {
     const allocator = std.testing.allocator;
-    const input =
-        \\3   4
-        \\4   3
-        \\2   5
-        \\1   3
-        \\3   9
-        \\3   3
-    ;
 
     const problem = Problem{
-        .input = input,
+        .input = example_input,
         .allocator = allocator,
     };
 
