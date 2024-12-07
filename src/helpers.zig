@@ -27,6 +27,10 @@ pub fn Set(comptime T: type) type {
             return self.data.contains(value);
         }
 
+        pub fn count(self: *Self) usize {
+            return self.data.count();
+        }
+
         pub fn deinit(self: *Self) void {
             self.data.deinit();
         }
