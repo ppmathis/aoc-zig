@@ -1,0 +1,12 @@
+{
+  "build_options": [
+    {
+      "name": "year",
+      "value": "2024"
+    },
+    {
+      "name": "day",
+      "value": "1"
+    }
+  ]
+}
