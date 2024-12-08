@@ -1,5 +1,129 @@
 const std = @import("std");
 
+pub const Coords = struct {
+    x: isize,
+    y: isize,
+
+    const Self = @This();
+
+    pub inline fn eql(self: Self, other: Coords) bool {
+        return self.x == other.x and self.y == other.y;
+    }
+};
+
+pub fn Map(comptime Tile: type) type {
+    return struct {
+        rows: isize,
+        cols: isize,
+        tiles: std.ArrayList(Tile),
+
+        const Self = @This();
+
+        pub const Entry = struct {
+            index: isize,
+            coords: Coords,
+            tile: *Tile,
+        };
+
+        pub const Iterator = struct {
+            map: *const Self,
+            index: isize,
+
+            pub fn next(self: *Iterator) ?Entry {
+                self.index += 1;
+                if (self.index >= self.map.tiles.items.len) {
+                    return null;
+                }
+
+                return .{
+                    .index = self.index,
+                    .coords = self.map.indexToCoords(@intCast(self.index)),
+                    .tile = &self.map.tiles.items[@intCast(self.index)],
+                };
+            }
+        };
+
+        pub fn parse(allocator: std.mem.Allocator, input: []const u8) !Self {
+            var rows: isize = 0;
+            var cols: isize = 0;
+            var tiles = std.ArrayList(Tile).init(allocator);
+            errdefer tiles.deinit();
+
+            var lines = std.mem.tokenizeScalar(u8, input, '\n');
+            while (lines.next()) |line| {
+                // Increment rows and determine columns if not set
+                rows += 1;
+                if (cols == 0) {
+                    cols = @intCast(line.len);
+                }
+
+                // Ensure each line has the same number of columns
+                if (line.len != cols) {
+                    std.debug.print("line has {d} columns, expected {d}\n", .{ line.len, cols });
+                    std.debug.print("line: {s}\n", .{line});
+                    return error.ColumnMismatch;
+                }
+
+                // Parse each character as tile
+                for (line) |c| {
+                    const tile: Tile = Tile.from(c);
+                    _ = try tiles.append(tile);
+                }
+            }
+
+            return .{
+                .rows = rows,
+                .cols = cols,
+                .tiles = tiles,
+            };
+        }
+
+        pub fn iterate(self: *const Self) Iterator {
+            return .{
+                .map = self,
+                .index = -1,
+            };
+        }
+
+        pub fn checkBounds(self: *const Self, coords: Coords) bool {
+            return coords.x >= 0 and coords.y >= 0 and coords.x < self.cols and coords.y < self.rows;
+        }
+
+        pub fn get(self: *const Self, coords: Coords) Tile {
+            const index = self.coordsToIndex(coords);
+            if (index < 0 or index >= self.tiles.items.len) {
+                return null;
+            }
+
+            return self.tiles.items[index];
+        }
+
+        pub fn set(self: *Self, coords: Coords, tile: Tile) void {
+            const index = self.coordsToIndex(coords);
+            if (index < 0 or index >= self.tiles.items.len) {
+                return;
+            }
+
+            self.tiles.items[index] = tile;
+        }
+
+        pub fn deinit(self: *Self) void {
+            self.tiles.deinit();
+        }
+
+        pub inline fn coordsToIndex(self: *const Self, coords: Coords) isize {
+            return coords.y * self.cols + coords.x;
+        }
+
+        pub inline fn indexToCoords(self: *const Self, index: isize) Coords {
+            return .{
+                .x = @mod(index, self.cols),
+                .y = @divFloor(index, self.cols),
+            };
+        }
+    };
+}
+
 pub fn Set(comptime T: type) type {
     return struct {
         data: HashMapSet,
@@ -23,11 +147,11 @@ pub fn Set(comptime T: type) type {
             _ = try self.data.getOrPut(value);
         }
 
-        pub fn contains(self: *Self, value: T) bool {
+        pub fn contains(self: *const Self, value: T) bool {
             return self.data.contains(value);
         }
 
-        pub fn count(self: *Self) usize {
+        pub fn count(self: *const Self) usize {
             return self.data.count();
         }
 
