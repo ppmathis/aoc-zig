@@ -142,7 +142,7 @@ const Antenna = struct {
 
     const Self = @This();
 
-    pub fn from(c: u8) Self {
+    pub fn from(c: u8) !Self {
         return switch (c) {
             '.' => .{ .frequency = null },
             else => .{ .frequency = c },

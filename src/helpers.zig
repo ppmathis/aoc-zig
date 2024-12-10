@@ -37,7 +37,7 @@ pub fn Map(comptime Tile: type) type {
 
                 return .{
                     .index = self.index,
-                    .coords = self.map.indexToCoords(@intCast(self.index)),
+                    .coords = self.map.indexToCoords(@intCast(self.index)).?,
                     .tile = &self.map.tiles.items[@intCast(self.index)],
                 };
             }
@@ -66,7 +66,7 @@ pub fn Map(comptime Tile: type) type {
 
                 // Parse each character as tile
                 for (line) |c| {
-                    const tile: Tile = Tile.from(c);
+                    const tile: Tile = try Tile.from(c);
                     _ = try tiles.append(tile);
                 }
             }
@@ -89,33 +89,37 @@ pub fn Map(comptime Tile: type) type {
             return coords.x >= 0 and coords.y >= 0 and coords.x < self.cols and coords.y < self.rows;
         }
 
-        pub fn get(self: *const Self, coords: Coords) Tile {
-            const index = self.coordsToIndex(coords);
-            if (index < 0 or index >= self.tiles.items.len) {
-                return null;
+        pub fn get(self: *const Self, coords: Coords) ?Tile {
+            if (self.coordsToIndex(coords)) |index| {
+                return self.tiles.items[@intCast(index)];
             }
 
-            return self.tiles.items[index];
+            return null;
         }
 
         pub fn set(self: *Self, coords: Coords, tile: Tile) void {
-            const index = self.coordsToIndex(coords);
-            if (index < 0 or index >= self.tiles.items.len) {
-                return;
+            if (self.coordsToIndex(coords)) |index| {
+                self.tiles.items[index] = tile;
             }
-
-            self.tiles.items[index] = tile;
         }
 
         pub fn deinit(self: *Self) void {
             self.tiles.deinit();
         }
 
-        pub inline fn coordsToIndex(self: *const Self, coords: Coords) isize {
+        pub inline fn coordsToIndex(self: *const Self, coords: Coords) ?isize {
+            if (coords.x < 0 or coords.y < 0 or coords.x >= self.cols or coords.y >= self.rows) {
+                return null;
+            }
+
             return coords.y * self.cols + coords.x;
         }
 
-        pub inline fn indexToCoords(self: *const Self, index: isize) Coords {
+        pub inline fn indexToCoords(self: *const Self, index: isize) ?Coords {
+            if (index < 0 or index >= self.tiles.items.len) {
+                return null;
+            }
+
             return .{
                 .x = @mod(index, self.cols),
                 .y = @divFloor(index, self.cols),
