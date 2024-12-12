@@ -1,5 +1,8 @@
 const std = @import("std");
 
+pub const CoordsSet = Set(Coords);
+pub const CoordsList = std.ArrayList(Coords);
+
 pub const Coords = struct {
     x: isize,
     y: isize,
