@@ -3,16 +3,20 @@ const std = @import("std");
 pub const CoordsSet = Set(Coords);
 pub const CoordsList = std.ArrayList(Coords);
 
-pub const Coords = struct {
-    x: isize,
-    y: isize,
+pub fn Vec2(comptime T: type) type {
+    return struct {
+        x: T,
+        y: T,
 
-    const Self = @This();
+        const Self = @This();
 
-    pub inline fn eql(self: Self, other: Coords) bool {
-        return self.x == other.x and self.y == other.y;
-    }
-};
+        pub inline fn eql(self: Self, other: Self) bool {
+            return self.x == other.x and self.y == other.y;
+        }
+    };
+}
+
+pub const Coords = Vec2(isize);
 
 pub fn Map(comptime Tile: type) type {
     return struct {
