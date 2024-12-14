@@ -46,6 +46,24 @@ pub fn Map(comptime Tile: type) type {
             }
         };
 
+        pub fn init(allocator: std.mem.Allocator, cols: isize, rows: isize, default: Tile) !Self {
+            // Calculate total map size and allocate tile array
+            const size: usize = @intCast(rows * cols);
+            var tiles = try std.ArrayList(Tile).initCapacity(allocator, size);
+
+            // Fill all tiles with default value
+            for (0..size) |_| {
+                _ = try tiles.append(default);
+            }
+
+            // Return initialized map
+            return .{
+                .rows = rows,
+                .cols = cols,
+                .tiles = tiles,
+            };
+        }
+
         pub fn parse(allocator: std.mem.Allocator, input: []const u8) !Self {
             var rows: isize = 0;
             var cols: isize = 0;
@@ -81,6 +99,12 @@ pub fn Map(comptime Tile: type) type {
             };
         }
 
+        pub fn clear(self: *Self, default: Tile) void {
+            for (self.tiles.items) |*tile| {
+                tile.* = default;
+            }
+        }
+
         pub fn iterate(self: *const Self) Iterator {
             return .{
                 .map = self,
@@ -102,7 +126,7 @@ pub fn Map(comptime Tile: type) type {
 
         pub fn set(self: *Self, coords: Coords, tile: Tile) void {
             if (self.coordsToIndex(coords)) |index| {
-                self.tiles.items[index] = tile;
+                self.tiles.items[@intCast(index)] = tile;
             }
         }
 
