@@ -10,6 +10,13 @@ pub fn Vec2(comptime T: type) type {
 
         const Self = @This();
 
+        pub inline fn add(self: Self, other: Self) Self {
+            return .{
+                .x = self.x + other.x,
+                .y = self.y + other.y,
+            };
+        }
+
         pub inline fn eql(self: Self, other: Self) bool {
             return self.x == other.x and self.y == other.y;
         }
